@@ -53,8 +53,10 @@ QUESTIONS = [
         "fabric",
         "What fabric is it?",
         lambda p: True,
-        lambda p: bool(p.metafield("fabric", "material") or p.has_option("fabric", "material"))
-        or _tags(p, rf"^({FABRICS})$"),
+        lambda p: (
+            bool(p.metafield("fabric", "material") or p.has_option("fabric", "material"))
+            or _tags(p, rf"^({FABRICS})$")
+        ),
         rf"\b({FABRICS})\b",
     ),
     Question(
@@ -97,8 +99,10 @@ QUESTIONS = [
     Question(
         "technique",
         "Is it hand block printed?",
-        lambda p: bool(re.search(r"print", f"{p.title} {p.description} {p.type}", re.I))
-        or _tags(p, TECHNIQUES),
+        lambda p: (
+            bool(re.search(r"print", f"{p.title} {p.description} {p.type}", re.I))
+            or _tags(p, TECHNIQUES)
+        ),
         lambda p: bool(p.metafield("technique", "print", "craft")) or _tags(p, TECHNIQUES),
         rf"\b({TECHNIQUES})\b",
     ),

@@ -96,7 +96,10 @@ def read_csv(path: str | Path) -> list[Product]:
         }
         products: dict[str, Product] = {}
         for i, row in enumerate(reader, start=2):  # row 1 is the header
-            get = lambda k: (row.get(k) or "").strip()  # noqa: E731
+
+            def get(k: str, row: dict = row) -> str:
+                return (row.get(k) or "").strip()
+
             handle = get("Handle")
             if not handle:
                 continue

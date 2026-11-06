@@ -76,9 +76,7 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.json:
         args.json.write_text(
-            json.dumps(
-                {"findings": [f.__dict__ for f in findings], "probe": answers}, indent=2
-            ),
+            json.dumps({"findings": [f.__dict__ for f in findings], "probe": answers}, indent=2),
             encoding="utf-8",
         )
     levels = {f.level for f in findings}

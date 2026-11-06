@@ -52,8 +52,10 @@ def load_pack(path_or_name: str) -> Pack:
     if p.suffix in {".yaml", ".yml"} and p.exists():
         text = p.read_text(encoding="utf-8")
     else:
-        text = resources.files("agentready.packs").joinpath(f"{path_or_name}.yaml").read_text(
-            encoding="utf-8"
+        text = (
+            resources.files("agentready.packs")
+            .joinpath(f"{path_or_name}.yaml")
+            .read_text(encoding="utf-8")
         )
     data = yaml.safe_load(text)
     rules = []
