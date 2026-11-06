@@ -1,0 +1,34 @@
+pack: gmc
+title: Google Merchant Center product data (apparel subset)
+source: https://support.google.com/merchants/answer/7052112
+checked: 2026-11-07
+rules:
+  - id: gmc.title-length
+    level: error
+    check: max_length
+    params: {field: title, max: 150}
+    message: Merchant Center truncates titles over 150 characters.
+  - id: gmc.description-length
+    level: error
+    check: max_length
+    params: {field: description, max: 5000}
+    message: Merchant Center limits description to 5,000 characters.
+  - id: gmc.image
+    level: error
+    check: required
+    params: {field: image}
+    message: image_link is required.
+  - id: gmc.color
+    level: warning
+    check: product_attribute
+    params: {names: [color, colour, color-pattern], label: color}
+    message: color is required for apparel in several target countries.
+  - id: gmc.size
+    level: warning
+    check: product_attribute
+    params: {names: [size], label: size}
+    message: size is required for apparel in several target countries.
+  - id: gmc.variant-image
+    level: warning
+    check: variant_image
+    message: Each colour variant should have its own image.

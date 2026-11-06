@@ -1,0 +1,62 @@
+pack: acp
+title: OpenAI Agentic Commerce product feed (Stable)
+source: https://developers.openai.com/commerce/specs/file-upload/products
+checked: 2026-11-07
+rules:
+  - id: acp.item-id
+    level: error
+    check: variant_sku
+    message: item_id must be stable and unique per variant; agentready maps it from Variant SKU.
+  - id: acp.title
+    level: error
+    check: required
+    params: {field: title}
+    message: title is required.
+  - id: acp.title-length
+    level: warning
+    check: max_length
+    params: {field: title, max: 150}
+    message: The spec asks for titles of at most 150 characters.
+  - id: acp.description
+    level: error
+    check: required
+    params: {field: description}
+    message: description is required, as plain text.
+  - id: acp.description-length
+    level: warning
+    check: max_length
+    params: {field: description, max: 5000}
+    message: The spec asks for descriptions of at most 5,000 characters.
+  - id: acp.brand
+    level: error
+    check: required
+    params: {field: vendor}
+    message: brand is required; agentready maps it from Vendor.
+  - id: acp.image
+    level: error
+    check: required
+    params: {field: image}
+    message: image_url is required.
+  - id: acp.price
+    level: error
+    check: variant_price
+    message: price must be a positive amount.
+  - id: acp.availability
+    level: warning
+    check: availability_known
+    message: availability must be in_stock, out_of_stock, pre_order, backorder or unknown.
+  - id: acp.size
+    level: info
+    check: product_attribute
+    params: {names: [size], label: size}
+    message: size is optional in the spec but is how agents answer "do you have XL".
+  - id: acp.color
+    level: info
+    check: product_attribute
+    params: {names: [color, colour, color-pattern], label: color}
+    message: color is optional in the spec; it should match the variant image.
+  - id: acp.material
+    level: info
+    check: product_attribute
+    params: {names: [material, fabric], label: material}
+    message: material is optional in the spec; buyers ask about it constantly.

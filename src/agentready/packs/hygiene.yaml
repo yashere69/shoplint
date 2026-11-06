@@ -1,0 +1,34 @@
+pack: hygiene
+title: Catalog hygiene (not tied to a spec)
+source: agentready
+checked: 2026-11-07
+rules:
+  - id: hygiene.alt-text
+    level: warning
+    check: image_alt_text
+    message: Images need alt text, for screen readers and for agents that can't see images.
+  - id: hygiene.size-mix
+    level: warning
+    check: size_system_consistent
+    message: One product mixes size systems, so "is M the same as 38?" has no answer.
+  - id: hygiene.size-system
+    level: info
+    check: catalog_size_system
+    message: This product's sizes don't follow the rest of the catalog.
+  - id: hygiene.option-case
+    level: warning
+    check: option_case_consistent
+    message: Option values that differ only in case split filters and variant matching.
+  - id: hygiene.compare-at
+    level: warning
+    check: compare_at_above_price
+    message: A compare-at price at or below the selling price reads as a fake discount.
+  - id: hygiene.thin-description
+    level: info
+    check: min_words
+    params: {field: description, min: 25}
+    message: Very short descriptions leave buyer questions unanswerable.
+  - id: hygiene.empty-active
+    level: error
+    check: active_but_empty
+    message: Active product with nothing to buy.
