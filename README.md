@@ -31,12 +31,17 @@ a feed or an agent sees it: field by field, not as the product page a person rea
 
 ```bash
 pip install git+https://github.com/yashere69/agentready
-agentready audit products_export.csv --html report.html
+agentready audit products_export.csv --html report.html --findings-csv fixes.csv
 agentready export products_export.csv --store-url https://yourstore.com --seller "Your Store" -o feed.jsonl
 ```
 
 Get the CSV from Shopify admin → Products → Export → "All products", "CSV for Excel,
-Numbers, or other spreadsheet programs". Nothing leaves your machine.
+Numbers, or other spreadsheet programs". Nothing leaves your machine. A file that has been
+opened and re-saved in Excel on Windows (cp1252 rather than UTF-8) is read too.
+
+`--findings-csv` gives one row per problem (level, rule, product, detail, why), which is
+the form most stores actually work through: sort by product, fix, re-export, re-run. On a
+3,000-product, 12,000-variant export the audit takes about a third of a second.
 
 ## What it checks
 
@@ -73,6 +78,13 @@ what's in the set. It sorts each answer into one of three buckets:
 - **missing**: nowhere
 
 It is not an LLM. It answers "is this fact present as data?", which is what feeds reward.
+
+The questions are YAML. The built-in set
+([`questions/apparel-india.yaml`](src/agentready/questions/apparel-india.yaml)) is for
+Indian ethnic wear. A store selling kettles or books writes its own (warranty, voltage,
+edition) and passes `--questions my-questions.yaml`. Each question says where a structured
+answer may live (option names, metafield keys, a tag pattern, inventory) and what to look
+for in the description.
 Because it's deterministic, before/after numbers can be compared.
 [results/before-after.md](results/before-after.md) has the sample catalog before and after
 fixing (`python tools/before_after.py` regenerates it):
@@ -118,9 +130,8 @@ More in [docs/architecture.md](docs/architecture.md).
 
 - Only Shopify's CSV export. There's no Admin API sync yet.
 - Images aren't analysed. A colour variant pointing at the wrong photo won't be caught.
-- The probe's keyword lists are tuned for Indian ethnic wear (fabrics like mul and
-  chanderi, techniques like dabu and ajrakh). Other categories would need their own
-  question set.
+- The built-in question set is tuned for Indian ethnic wear. Other categories need their
+  own YAML; nothing else changes.
 - Google's UCP and Merchant Center have more rules than the apparel subset here.
 
 ## Development
