@@ -1,6 +1,6 @@
 [project]
 name = "agentready"
-version = "0.1.0"
+version = "0.2.0"
 description = "Audit a Shopify product export against what AI shopping agents and product feeds need."
 readme = "README.md"
 license = { text = "MIT" }
@@ -22,7 +22,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-agentready = ["packs/*.yaml"]
+agentready = ["packs/*.yaml", "questions/*.yaml"]
 
 [tool.ruff]
 line-length = 100

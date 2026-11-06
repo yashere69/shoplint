@@ -88,3 +88,70 @@ def test_cli_audit_exit_codes_and_outputs(tmp_path, capsys):
 
 def test_cli_rejects_unknown_file(capsys):
     assert main(["audit", "nope.csv"]) == 2
+
+
+def test_excel_resaved_cp1252_csv_is_read(tmp_path):
+    p = tmp_path / "excel.csv"
+    p.write_bytes("Handle,Title,Variant Price\nk,Kurta café,999\n".encode("cp1252"))
+    (product,) = read_csv(p)
+    assert product.title == "Kurta café"
+
+
+def test_unknown_pack_is_a_clean_error(capsys):
+    assert main(["audit", str(BEFORE), "--pack", "nope"]) == 2
+    assert "use one of acp, gmc, hygiene" in capsys.readouterr().err
+
+
+def test_large_catalog_stays_fast(tmp_path):
+    import time
+
+    lines = ["Handle,Title,Option1 Name,Option1 Value,Variant SKU,Variant Price"]
+    for i in range(3000):
+        for j, size in enumerate(["S", "M", "L", "XL"]):
+            lines.append(
+                f"p{i},{'Kurta' if j == 0 else ''},{'Size' if j == 0 else ''},"
+                f"{size},SKU{i}{size},999"
+            )
+    p = tmp_path / "big.csv"
+    p.write_text("\n".join(lines))
+    start = time.perf_counter()
+    findings = audit(read_csv(p), [load_pack(n) for n in builtin_packs()])
+    assert time.perf_counter() - start < 5  # was ~20 s when size systems were recounted
+    assert findings
+
+
+def test_custom_question_set(tmp_path, make_product):
+    from agentready.probe import load_questions
+
+    qs = tmp_path / "q.yaml"
+    qs.write_text(
+        "- id: warranty\n  ask: Is there a warranty?\n"
+        "  structured: {metafields: [warranty]}\n  prose: '\\bwarranty\\b'\n"
+        "- id: voltage\n  ask: What voltage?\n  applies_if: {text: lamp}\n"
+        "  structured: {options: [voltage]}\n  prose: '\\d+ ?V\\b'\n"
+    )
+    questions = load_questions(qs)
+    kettle = make_product(title="Steel kettle", body_html="<p>1 year warranty</p>")
+    where = {a.question: a.where for a in probe([kettle], questions)}
+    assert where == {"warranty": "prose-only"}  # voltage only applies to lamps
+
+
+def test_bad_question_file_is_a_clean_error(tmp_path, capsys):
+    qs = tmp_path / "q.yaml"
+    qs.write_text("- id: x\n  ask: y\n")
+    assert main(["audit", str(BEFORE), "--questions", str(qs)]) == 2
+    assert "needs id, ask and prose" in capsys.readouterr().err
+
+
+def test_findings_csv_and_input_protection(tmp_path):
+    import csv as csvmod
+
+    out = tmp_path / "fixes.csv"
+    main(["audit", str(BEFORE), "--findings-csv", str(out), "--fail-on", "never"])
+    rows = list(csvmod.DictReader(out.open()))
+    assert rows[0].keys() == {"level", "rule", "product", "detail", "why"}
+    assert any(r["rule"] == "acp.item-id" for r in rows)
+    copy = tmp_path / "in.csv"
+    copy.write_bytes(BEFORE.read_bytes())
+    assert main(["audit", str(copy), "--findings-csv", str(copy)]) == 2
+    assert copy.read_bytes() == BEFORE.read_bytes()

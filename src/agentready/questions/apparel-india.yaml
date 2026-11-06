@@ -1,0 +1,51 @@
+# Buyer questions for Indian ethnic wear. Copy this file and edit it for another category,
+# then pass it with --questions.
+#
+#   applies_if   optional; the question is only asked when this regex matches the title,
+#                type and description (text) or any tag (tags)
+#   structured   where a structured answer may live: option names, metafield keys (any
+#                namespace), a regex any tag may match, or inventory: true
+#   prose        regex searched in the description when nothing structured exists
+- id: fabric
+  ask: What fabric is it?
+  structured:
+    options: [fabric, material]
+    metafields: [fabric, material]
+    tags: "^(cotton|linen|silk|chanderi|georgette|chiffon|rayon|viscose|modal|mul|khadi|crepe|organza|muslin|tussar|kota)$"
+  prose: "\\b(cotton|linen|silk|chanderi|georgette|chiffon|rayon|viscose|modal|mul|khadi|crepe|organza|muslin|tussar|kota)\\b"
+- id: sizes
+  ask: Which sizes does it come in?
+  structured: {options: [size]}
+  prose: "\\b(XS|S|M|L|XL|XXL|free size|sizes?)\\b"
+- id: colour
+  ask: What colour is it?
+  structured:
+    options: [color, colour]
+    metafields: [color, colour, color-pattern]
+  prose: "\\b(indigo|blue|red|maroon|green|yellow|mustard|pink|rust|white|ivory|black|beige|grey|orange|peach|teal|navy|purple|lavender)\\b"
+- id: in-stock
+  ask: Is it in stock?
+  structured: {inventory: true}
+  prose: "\\b(in stock|available|ready to ship)\\b"
+- id: care
+  ask: How do I wash it?
+  structured: {metafields: [care, care_instructions, wash_care]}
+  prose: "\\b(hand wash|machine wash|dry clean|wash)\\b"
+- id: length
+  ask: How long is the kurta?
+  structured: {metafields: [length, kurta_length]}
+  prose: "\\b\\d{2}(\\.\\d)?\\s*(inches|inch|in|cm)\\b"
+- id: technique
+  ask: Is it hand block printed?
+  applies_if:
+    text: "print"
+    tags: "hand[- ]?block|ajrakh|bagru|dabu|kalamkari|shibori|bandhani|ikat|chikankari"
+  structured:
+    metafields: [technique, print, craft]
+    tags: "hand[- ]?block|ajrakh|bagru|dabu|kalamkari|shibori|bandhani|ikat|chikankari"
+  prose: "\\b(hand[- ]?block|ajrakh|bagru|dabu|kalamkari|shibori|bandhani|ikat|chikankari)\\b"
+- id: set-contents
+  ask: What's included in the set?
+  applies_if: {text: "\\bset\\b", fields: [title, type]}
+  structured: {metafields: [set_includes, includes, set_contents]}
+  prose: "\\b(dupatta|pants?|palazzo|bottoms?|includes?)\\b"
