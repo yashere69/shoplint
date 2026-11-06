@@ -30,6 +30,21 @@ class Context:
             for v in p.variants:
                 if v.sku:
                     self.sku_counts[v.sku] = self.sku_counts.get(v.sku, 0) + 1
+        self._dominant_size: str | None | bool = False  # False = not computed yet
+
+    @property
+    def dominant_size_system(self) -> str | None:
+        """Computed once per audit; recomputing it per product made big catalogs quadratic."""
+        if self._dominant_size is False:
+            counts: dict[str, int] = {}
+            for q in self.products:
+                n = q.has_option("size")
+                for v in q.option_values(n) if n else []:
+                    s = size_system(v)
+                    if s != "free":
+                        counts[s] = counts.get(s, 0) + 1
+            self._dominant_size = max(counts, key=lambda k: counts[k]) if counts else None
+        return self._dominant_size  # type: ignore[return-value]
 
 
 def check(name: str) -> Callable[[CheckFn], CheckFn]:
@@ -131,16 +146,9 @@ def size_system_consistent(p: Product, params: dict, ctx: Context) -> Iterator[F
 @check("catalog_size_system")
 def catalog_size_system(p: Product, params: dict, ctx: Context) -> Iterator[Finding]:
     """Flag a product whose size system differs from the one most of the catalog uses."""
-    counts: dict[str, int] = {}
-    for q in ctx.products:
-        n = q.has_option("size")
-        for v in q.option_values(n) if n else []:
-            s = size_system(v)
-            if s != "free":
-                counts[s] = counts.get(s, 0) + 1
-    if not counts:
+    dominant = ctx.dominant_size_system
+    if dominant is None:
         return
-    dominant = max(counts, key=lambda k: counts[k])
     name = p.has_option("size")
     own = {size_system(v) for v in p.option_values(name)} - {"free"} if name else set()
     if own and dominant not in own:

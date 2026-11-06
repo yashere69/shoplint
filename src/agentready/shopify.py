@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import csv
 import html
+import io
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -84,8 +85,19 @@ def html_to_text(s: str) -> str:
     return re.sub(r"[ \t]+", " ", re.sub(r"\n\s*\n+", "\n", s)).strip()
 
 
+def _open(path: str | Path):
+    """Shopify exports UTF-8, but a CSV that has been opened and re-saved in Excel on
+    Windows is usually cp1252. Try UTF-8 first and fall back rather than fail."""
+    raw = Path(path).read_bytes()
+    try:
+        return io.StringIO(raw.decode("utf-8-sig"), newline=""), "utf-8"
+    except UnicodeDecodeError:
+        return io.StringIO(raw.decode("cp1252", errors="replace"), newline=""), "cp1252"
+
+
 def read_csv(path: str | Path) -> list[Product]:
-    with open(path, newline="", encoding="utf-8-sig") as f:
+    f, _ = _open(path)
+    with f:
         reader = csv.DictReader(f)
         if not reader.fieldnames or "Handle" not in reader.fieldnames:
             raise ValueError(f"{path}: not a Shopify product export (no 'Handle' column)")

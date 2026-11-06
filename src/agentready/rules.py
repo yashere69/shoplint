@@ -51,11 +51,16 @@ def load_pack(path_or_name: str) -> Pack:
     p = Path(path_or_name)
     if p.suffix in {".yaml", ".yml"} and p.exists():
         text = p.read_text(encoding="utf-8")
-    else:
+    elif path_or_name in builtin_packs():
         text = (
             resources.files("agentready.packs")
             .joinpath(f"{path_or_name}.yaml")
             .read_text(encoding="utf-8")
+        )
+    else:
+        raise ValueError(
+            f"no rule pack {path_or_name!r}: use one of {', '.join(builtin_packs())} "
+            "or a path to a .yaml file"
         )
     data = yaml.safe_load(text)
     rules = []
