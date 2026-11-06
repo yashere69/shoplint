@@ -68,7 +68,9 @@ QUESTIONS = [
         "colour",
         "What colour is it?",
         lambda p: True,
-        lambda p: bool(p.has_option("color", "colour") or p.metafield("color", "colour")),
+        lambda p: bool(
+            p.has_option("color", "colour") or p.metafield("color", "colour", "color-pattern")
+        ),
         rf"\b({COLOURS})\b",
     ),
     Question(
