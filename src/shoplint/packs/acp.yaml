@@ -6,7 +6,7 @@ rules:
   - id: acp.item-id
     level: error
     check: variant_sku
-    message: item_id must be stable and unique per variant; agentready maps it from Variant SKU.
+    message: item_id must be stable and unique per variant; shoplint maps it from Variant SKU.
   - id: acp.title
     level: error
     check: required
@@ -31,7 +31,7 @@ rules:
     level: error
     check: required
     params: {field: vendor}
-    message: brand is required; agentready maps it from Vendor.
+    message: brand is required; shoplint maps it from Vendor.
   - id: acp.image
     level: error
     check: required

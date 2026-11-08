@@ -21,7 +21,7 @@ jobs:
       - run: pip install .
       - run: |
           mkdir -p site
-          agentready audit examples/indigo-loom.csv --fail-on never \
+          shoplint audit examples/indigo-loom.csv --fail-on never \
             --title "Indigo Loom (fictional store): sample audit" --html site/index.html
       - uses: actions/upload-pages-artifact@v3
         with:

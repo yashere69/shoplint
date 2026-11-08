@@ -1,4 +1,4 @@
-"""agentready command line."""
+"""shoplint command line."""
 
 from __future__ import annotations
 
@@ -19,8 +19,8 @@ from .shopify import read_csv
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(prog="agentready")
-    ap.add_argument("--version", action="version", version=f"agentready {__version__}")
+    ap = argparse.ArgumentParser(prog="shoplint")
+    ap.add_argument("--version", action="version", version=f"shoplint {__version__}")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     a = sub.add_parser("audit", help="check a Shopify product CSV")

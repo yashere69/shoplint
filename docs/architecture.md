@@ -1,4 +1,4 @@
-# agentready internals
+# shoplint internals
 
 ```mermaid
 flowchart LR

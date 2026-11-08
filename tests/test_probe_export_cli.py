@@ -3,11 +3,11 @@ from pathlib import Path
 
 import yaml
 
-from agentready.cli import main
-from agentready.export import acp_rows
-from agentready.probe import probe, summary
-from agentready.rules import audit, builtin_packs, load_pack
-from agentready.shopify import read_csv
+from shoplint.cli import main
+from shoplint.export import acp_rows
+from shoplint.probe import probe, summary
+from shoplint.rules import audit, builtin_packs, load_pack
+from shoplint.shopify import read_csv
 
 ROOT = Path(__file__).resolve().parent.parent
 BEFORE = ROOT / "examples" / "indigo-loom.csv"
@@ -121,7 +121,7 @@ def test_large_catalog_stays_fast(tmp_path):
 
 
 def test_custom_question_set(tmp_path, make_product):
-    from agentready.probe import load_questions
+    from shoplint.probe import load_questions
 
     qs = tmp_path / "q.yaml"
     qs.write_text(

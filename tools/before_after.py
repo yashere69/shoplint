@@ -8,9 +8,9 @@ from __future__ import annotations
 from collections import Counter
 from pathlib import Path
 
-from agentready.probe import probe, summary
-from agentready.rules import audit, builtin_packs, load_pack
-from agentready.shopify import read_csv
+from shoplint.probe import probe, summary
+from shoplint.rules import audit, builtin_packs, load_pack
+from shoplint.shopify import read_csv
 
 ROOT = Path(__file__).resolve().parent.parent
 

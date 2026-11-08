@@ -65,7 +65,7 @@ def load_questions(path: str | Path | None = None) -> list[Question]:
     """The built-in Indian ethnic-wear set, or your own YAML in the same shape."""
     if path is None:
         text = (
-            resources.files("agentready.questions")
+            resources.files("shoplint.questions")
             .joinpath("apparel-india.yaml")
             .read_text(encoding="utf-8")
         )

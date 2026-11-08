@@ -53,7 +53,7 @@ def load_pack(path_or_name: str) -> Pack:
         text = p.read_text(encoding="utf-8")
     elif path_or_name in builtin_packs():
         text = (
-            resources.files("agentready.packs")
+            resources.files("shoplint.packs")
             .joinpath(f"{path_or_name}.yaml")
             .read_text(encoding="utf-8")
         )
@@ -84,7 +84,7 @@ def load_pack(path_or_name: str) -> Pack:
 def builtin_packs() -> list[str]:
     return sorted(
         f.name.removesuffix(".yaml")
-        for f in resources.files("agentready.packs").iterdir()
+        for f in resources.files("shoplint.packs").iterdir()
         if f.name.endswith(".yaml")
     )
 

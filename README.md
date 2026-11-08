@@ -1,17 +1,17 @@
-# agentready
+# shoplint
 
 Checks a Shopify product export against what AI shopping agents and product feeds
 actually read, and tells you which buyer questions your catalog can't answer.
 
 ```
-$ agentready audit products_export.csv
+$ shoplint audit products_export.csv
 13 products checked against: acp, gmc, hygiene
 6 errors, 24 warnings, 21 info
 ...
 Buyer questions answerable from structured data: 50/81 (61.7%)
 ```
 
-**Live sample report:** https://yashere69.github.io/agentready/ (built by CI from the
+**Live sample report:** https://yashere69.github.io/shoplint/ (built by CI from the
 fictional catalog in `examples/`)
 
 ![HTML report showing answerability per buyer question and a findings table](docs/report.png)
@@ -30,9 +30,9 @@ a feed or an agent sees it: field by field, not as the product page a person rea
 ## Install and run
 
 ```bash
-pip install git+https://github.com/yashere69/agentready
-agentready audit products_export.csv --html report.html --findings-csv fixes.csv
-agentready export products_export.csv --store-url https://yourstore.com --seller "Your Store" -o feed.jsonl
+pip install git+https://github.com/yashere69/shoplint
+shoplint audit products_export.csv --html report.html --findings-csv fixes.csv
+shoplint export products_export.csv --store-url https://yourstore.com --seller "Your Store" -o feed.jsonl
 ```
 
 Get the CSV from Shopify admin → Products → Export → "All products", "CSV for Excel,
@@ -63,9 +63,9 @@ A rule is a few lines:
   message: One product mixes size systems, so "is M the same as 38?" has no answer.
 ```
 
-`check` names a function in `src/agentready/checks.py`. You can add a pack for your own
+`check` names a function in `src/shoplint/checks.py`. You can add a pack for your own
 store's conventions without touching Python, as long as it reuses existing checks:
-`agentready audit export.csv --pack my-rules.yaml`.
+`shoplint audit export.csv --pack my-rules.yaml`.
 
 ## The question probe
 
@@ -80,7 +80,7 @@ what's in the set. It sorts each answer into one of three buckets:
 It is not an LLM. It answers "is this fact present as data?", which is what feeds reward.
 
 The questions are YAML. The built-in set
-([`questions/apparel-india.yaml`](src/agentready/questions/apparel-india.yaml)) is for
+([`questions/apparel-india.yaml`](src/shoplint/questions/apparel-india.yaml)) is for
 Indian ethnic wear. A store selling kettles or books writes its own (warranty, voltage,
 edition) and passes `--questions my-questions.yaml`. Each question says where a structured
 answer may live (option names, metafield keys, a tag pattern, inventory) and what to look
@@ -101,7 +101,7 @@ ranking in any assistant.
 
 ## Feed export
 
-`agentready export` writes one JSON line per variant in the ACP shape: `item_id` from SKU,
+`shoplint export` writes one JSON line per variant in the ACP shape: `item_id` from SKU,
 `group_id`, `listing_has_variations` and `variant_dict` for multi-variant products, `size`,
 `color` and `material` when they exist as data, and price as `"1890.00 INR"`.
 
@@ -118,7 +118,7 @@ is skipped and reported on stderr. Two limits come from the CSV itself:
   on required field counts. A finding is only as good as the spec version behind it.
 - **Drafts are skipped** (they aren't syndicated), except by the rule that flags active
   products with nothing to buy.
-- **Size systems are classified, not normalised.** agentready can tell you "S, M, 38, 40" is
+- **Size systems are classified, not normalised.** shoplint can tell you "S, M, 38, 40" is
   a mix. Mapping 38 to M is the store's call, so it doesn't guess.
 - **The sample catalog has reviewed expectations.** `eval/expected.yaml` lists every
   error and warning that should fire on `examples/indigo-loom.csv`, and a test fails if a

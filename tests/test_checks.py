@@ -1,5 +1,5 @@
-from agentready.checks import REGISTRY, Context, size_system
-from agentready.shopify import Image
+from shoplint.checks import REGISTRY, Context, size_system
+from shoplint.shopify import Image
 
 from .conftest import variant
 

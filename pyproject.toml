@@ -1,5 +1,5 @@
 [project]
-name = "agentready"
+name = "shoplint"
 version = "0.2.0"
 description = "Audit a Shopify product export against what AI shopping agents and product feeds need."
 readme = "README.md"
@@ -12,7 +12,7 @@ dependencies = ["pyyaml>=6"]
 dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.10", "types-PyYAML"]
 
 [project.scripts]
-agentready = "agentready.cli:main"
+shoplint = "shoplint.cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -22,7 +22,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-agentready = ["packs/*.yaml", "questions/*.yaml"]
+shoplint = ["packs/*.yaml", "questions/*.yaml"]
 
 [tool.ruff]
 line-length = 100

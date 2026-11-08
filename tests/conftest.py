@@ -1,6 +1,6 @@
 import pytest
 
-from agentready.shopify import Image, Product, Variant
+from shoplint.shopify import Image, Product, Variant
 
 
 def variant(sku="SKU-1", price="1000.00", options=None, **kw):

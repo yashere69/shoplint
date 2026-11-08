@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from agentready.shopify import html_to_text, read_csv
+from shoplint.shopify import html_to_text, read_csv
 
 SAMPLE = Path(__file__).resolve().parent.parent / "examples" / "indigo-loom.csv"
 

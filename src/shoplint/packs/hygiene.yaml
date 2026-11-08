@@ -1,6 +1,6 @@
 pack: hygiene
 title: Catalog hygiene (not tied to a spec)
-source: agentready
+source: shoplint
 checked: 2026-11-07
 rules:
   - id: hygiene.alt-text
