@@ -17,7 +17,7 @@ AFTER = ROOT / "examples" / "indigo-loom-fixed.csv"
 def test_sample_catalog_matches_reviewed_expectations():
     findings = audit(read_csv(BEFORE), [load_pack(n) for n in builtin_packs()])
     got = sorted([f.rule, f.target] for f in findings if f.level != "info")
-    expected = sorted(yaml.safe_load((ROOT / "eval" / "expected.yaml").read_text()))
+    expected = sorted(yaml.safe_load((ROOT / "eval" / "expected.yaml").read_text(encoding="utf-8")))
     assert got == expected
 
 
@@ -64,9 +64,9 @@ def test_cli_audit_exit_codes_and_outputs(tmp_path, capsys):
         )
         == 1
     )
-    html = (tmp_path / "r.html").read_text()
+    html = (tmp_path / "r.html").read_text(encoding="utf-8")
     assert '<html lang="en">' in html and "acp.item-id" in html
-    data = json.loads((tmp_path / "r.json").read_text())
+    data = json.loads((tmp_path / "r.json").read_text(encoding="utf-8"))
     assert data["probe"]["questions"] > 0
     assert (
         main(
@@ -83,7 +83,7 @@ def test_cli_audit_exit_codes_and_outputs(tmp_path, capsys):
         )
         == 0
     )
-    assert len((tmp_path / "feed.jsonl").read_text().splitlines()) > 20
+    assert len((tmp_path / "feed.jsonl").read_text(encoding="utf-8").splitlines()) > 20
 
 
 def test_cli_rejects_unknown_file(capsys):
@@ -113,7 +113,7 @@ def test_large_catalog_stays_fast(tmp_path):
                 f"{size},SKU{i}{size},999"
             )
     p = tmp_path / "big.csv"
-    p.write_text("\n".join(lines))
+    p.write_text("\n".join(lines), encoding="utf-8")
     start = time.perf_counter()
     findings = audit(read_csv(p), [load_pack(n) for n in builtin_packs()])
     assert time.perf_counter() - start < 5  # was ~20 s when size systems were recounted
@@ -128,7 +128,8 @@ def test_custom_question_set(tmp_path, make_product):
         "- id: warranty\n  ask: Is there a warranty?\n"
         "  structured: {metafields: [warranty]}\n  prose: '\\bwarranty\\b'\n"
         "- id: voltage\n  ask: What voltage?\n  applies_if: {text: lamp}\n"
-        "  structured: {options: [voltage]}\n  prose: '\\d+ ?V\\b'\n"
+        "  structured: {options: [voltage]}\n  prose: '\\d+ ?V\\b'\n",
+        encoding="utf-8",
     )
     questions = load_questions(qs)
     kettle = make_product(title="Steel kettle", body_html="<p>1 year warranty</p>")
@@ -138,7 +139,7 @@ def test_custom_question_set(tmp_path, make_product):
 
 def test_bad_question_file_is_a_clean_error(tmp_path, capsys):
     qs = tmp_path / "q.yaml"
-    qs.write_text("- id: x\n  ask: y\n")
+    qs.write_text("- id: x\n  ask: y\n", encoding="utf-8")
     assert main(["audit", str(BEFORE), "--questions", str(qs)]) == 2
     assert "needs id, ask and prose" in capsys.readouterr().err
 
@@ -148,7 +149,7 @@ def test_findings_csv_and_input_protection(tmp_path):
 
     out = tmp_path / "fixes.csv"
     main(["audit", str(BEFORE), "--findings-csv", str(out), "--fail-on", "never"])
-    rows = list(csvmod.DictReader(out.open()))
+    rows = list(csvmod.DictReader(out.open(encoding="utf-8")))
     assert rows[0].keys() == {"level", "rule", "product", "detail", "why"}
     assert any(r["rule"] == "acp.item-id" for r in rows)
     copy = tmp_path / "in.csv"

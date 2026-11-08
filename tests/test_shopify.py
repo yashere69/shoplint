@@ -35,6 +35,6 @@ def test_html_to_text():
 
 def test_rejects_non_shopify_csv(tmp_path):
     p = tmp_path / "x.csv"
-    p.write_text("name,price\nkurta,10\n")
+    p.write_text("name,price\nkurta,10\n", encoding="utf-8")
     with pytest.raises(ValueError, match="Handle"):
         read_csv(p)

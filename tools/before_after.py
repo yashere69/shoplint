@@ -46,7 +46,7 @@ def main() -> None:
         lines.append(f"| {q} | {c['structured']}/{total} | {after['structured']}/{total} |")
     out = ROOT / "results" / "before-after.md"
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(out.read_text())
+    print(out.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

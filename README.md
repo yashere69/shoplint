@@ -24,8 +24,16 @@ fields per item, and Google's feeds have their own rules. A shopping agent answe
 "is this kurta cotton, and do you have it in XL?" works from these structured fields
 first. A fabric mentioned only in a paragraph of marketing copy may or may not get used.
 
-I help run a small ethnic-wear store on Shopify and wanted a way to see the catalog the way
-a feed or an agent sees it: field by field, not as the product page a person reads.
+shoplint shows the catalog the way a feed or an agent sees it: field by field, not as the
+product page a person reads. It works on the export file, offline, before anything is
+published.
+
+Online validators exist for the next step. An [ACP feed validator](https://frontend-aishoppingfeeds.pages.dev/tools/acp-feed-validator/)
+checks a feed you've already built, and "is your store AI-ready" checkers such as
+[ucptools.dev](https://ucptools.dev) look at a live store URL. Feed platforms like
+Feedonomics or GoDataFeed fix feeds as a paid service. shoplint sits before all of them.
+It reads the Shopify export you already have, points each finding at a product and row you
+can fix in the admin, and asks whether buyers' questions can be answered at all.
 
 ## Install and run
 
@@ -36,12 +44,23 @@ shoplint export products_export.csv --store-url https://yourstore.com --seller "
 ```
 
 Get the CSV from Shopify admin → Products → Export → "All products", "CSV for Excel,
-Numbers, or other spreadsheet programs". Nothing leaves your machine. A file that has been
-opened and re-saved in Excel on Windows (cp1252 rather than UTF-8) is read too.
+Numbers, or other spreadsheet programs". Nothing leaves your machine.
+
+Both header formats are read. Shopify's current template uses `URL handle`,
+`Description`, `Price` and `Continue selling when out of stock`, where older exports used
+`Handle`, `Body (HTML)`, `Variant Price` and `Variant Inventory Policy`. Headers are matched
+without regard to case or spacing. So are files that have been through a spreadsheet: a
+BOM, cp1252 from Excel on Windows, or semicolon or tab separators from European-locale
+Excel. 0.2 read only the older headers, so it refused every file exported from Shopify's
+current admin. `tests/test_formats.py` reads the sample catalog in both formats and
+requires identical results, and a hypothesis test feeds it random files: they must either
+audit or fail with a clear error.
 
 `--findings-csv` gives one row per problem (level, rule, product, detail, why), which is
 the form most stores actually work through: sort by product, fix, re-export, re-run. On a
-3,000-product, 12,000-variant export the audit takes about a third of a second.
+3,000-product, 12,000-variant export the audit takes about a third of a second. A
+20,800-product, 59,200-row file (17 MB) takes 3.7 s and peaks at 258 MB of memory, measured
+in a Linux container.
 
 ## What it checks
 
@@ -116,8 +135,11 @@ is skipped and reported on stderr. Two limits come from the CSV itself:
 
 - **Packs are dated.** These specs changed several times in 2025–26 and sources disagree
   on required field counts. A finding is only as good as the spec version behind it.
-- **Drafts are skipped** (they aren't syndicated), except by the rule that flags active
-  products with nothing to buy.
+- **Drafts and archived products are skipped** (they aren't syndicated), except by the
+  rule that flags active products with nothing to buy.
+- **Clothing rules apply to clothing.** Size and colour rules skip gift cards and any
+  product whose category is outside "Apparel & Accessories". A product with no category is
+  assumed to be apparel, since that's who the built-in packs are for.
 - **Size systems are classified, not normalised.** shoplint can tell you "S, M, 38, 40" is
   a mix. Mapping 38 to M is the store's call, so it doesn't guess.
 - **The sample catalog has reviewed expectations.** `eval/expected.yaml` lists every
@@ -132,7 +154,15 @@ More in [docs/architecture.md](docs/architecture.md).
 - Images aren't analysed. A colour variant pointing at the wrong photo won't be caught.
 - The built-in question set is tuned for Indian ethnic wear. Other categories need their
   own YAML; nothing else changes.
-- Google's UCP and Merchant Center have more rules than the apparel subset here.
+- Google's UCP and Merchant Center have more rules than the apparel subset here. UCP
+  checkout fields such as `native_commerce`, return policies and `consumer_notice` aren't
+  checked.
+- The format support is built from Shopify's column documentation and constructed files.
+  It hasn't been run on an export from a real store with tens of thousands of products, so
+  expect a column or two Shopify adds that it doesn't know about yet.
+
+Stable: the `audit` and `export` commands, the findings CSV, and the pack YAML format.
+Experimental: the question probe's scoring and the built-in question set.
 
 ## Development
 
