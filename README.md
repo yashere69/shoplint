@@ -168,7 +168,7 @@ Experimental: the question probe's scoring and the built-in question set.
 
 ```bash
 pip install -e ".[dev]"
-ruff check . && mypy src && pytest
+ruff check . && ruff format --check . && mypy src && pytest
 ```
 
 MIT licensed. The `examples/` catalog is fictional; "Indigo Loom" is not a real store.
