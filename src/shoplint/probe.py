@@ -108,7 +108,7 @@ def probe(products: list[Product], questions: list[Question] | None = None) -> l
     questions = questions if questions is not None else load_questions()
     out = []
     for p in products:
-        if p.status == "draft":
+        if p.status != "active":  # drafts and archived products aren't shown to buyers
             continue
         text = p.description
         for q in questions:

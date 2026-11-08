@@ -19,11 +19,13 @@ rules:
     params: {field: image}
     message: image_link is required.
   - id: gmc.color
+    scope: apparel
     level: warning
     check: product_attribute
     params: {names: [color, colour, color-pattern], label: color}
     message: color is required for apparel in several target countries.
   - id: gmc.size
+    scope: apparel
     level: warning
     check: product_attribute
     params: {names: [size], label: size}

@@ -26,6 +26,7 @@ class Rule:
     check: str
     params: dict
     message: str
+    scope: str = "all"  # "apparel": skip products that are clearly not clothing
 
 
 @dataclass
@@ -67,6 +68,8 @@ def load_pack(path_or_name: str) -> Pack:
     for r in data["rules"]:
         if r["check"] not in REGISTRY:
             raise ValueError(f"{data['pack']}: rule {r['id']} uses unknown check {r['check']!r}")
+        if r.get("scope", "all") not in {"all", "apparel"}:
+            raise ValueError(f"{data['pack']}: rule {r['id']} has bad scope {r.get('scope')!r}")
         if r.get("level", "warning") not in LEVELS:
             raise ValueError(f"{data['pack']}: rule {r['id']} has bad level {r.get('level')!r}")
         rules.append(
@@ -76,6 +79,7 @@ def load_pack(path_or_name: str) -> Pack:
                 check=r["check"],
                 params=r.get("params", {}),
                 message=r["message"],
+                scope=r.get("scope", "all"),
             )
         )
     return Pack(data["pack"], data["title"], data["source"], str(data["checked"]), rules)
@@ -96,8 +100,10 @@ def audit(products: list[Product], packs: list[Pack]) -> list[Finding]:
         for rule in pack.rules:
             fn = REGISTRY[rule.check]
             for p in products:
-                if p.status == "draft" and rule.check != "active_but_empty":
-                    continue  # drafts aren't syndicated; don't drown the report in them
+                if p.status != "active" and rule.check != "active_but_empty":
+                    continue  # drafts and archived products aren't syndicated
+                if rule.scope == "apparel" and not p.is_apparel:
+                    continue
                 for target, detail in fn(p, rule.params, ctx):
                     findings.append(
                         Finding(pack.name, rule.id, rule.level, target, rule.message, detail)
