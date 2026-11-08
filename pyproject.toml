@@ -1,6 +1,6 @@
 [project]
 name = "shoplint"
-version = "0.3.0"
+version = "0.3.1"
 description = "Audit a Shopify product export against what AI shopping agents and product feeds need."
 readme = "README.md"
 license = { text = "MIT" }

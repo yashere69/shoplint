@@ -2,7 +2,7 @@
 
 Versions before 0.3.0 were published under the name agentready.
 
-## Unreleased
+## 0.3.1
 
 - Output is UTF-8 even when redirected on Windows, where it used to follow the code page
   and fail on Devanagari text.
