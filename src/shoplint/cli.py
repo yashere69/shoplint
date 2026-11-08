@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import io
 import json
 import re
 import sys
@@ -18,7 +19,17 @@ from .rules import audit, builtin_packs, load_pack
 from .shopify import read_csv
 
 
+def _utf8_output() -> None:
+    """Write UTF-8 even when output is redirected on Windows, where it would otherwise use
+    the locale's code page and fail on Devanagari or Hinglish text."""
+    for stream in (sys.stdout, sys.stderr):
+        enc = (stream.encoding or "").lower().replace("-", "")
+        if enc != "utf8" and isinstance(stream, io.TextIOWrapper):
+            stream.reconfigure(encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
+    _utf8_output()
     ap = argparse.ArgumentParser(prog="shoplint")
     ap.add_argument("--version", action="version", version=f"shoplint {__version__}")
     sub = ap.add_subparsers(dest="cmd", required=True)

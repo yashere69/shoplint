@@ -4,6 +4,9 @@ Versions before 0.3.0 were published under the name agentready.
 
 ## Unreleased
 
+- Output is UTF-8 even when redirected on Windows, where it used to follow the code page
+  and fail on Devanagari text.
+- CI runs the tests on Windows and macOS as well as Linux.
 - A rule pack that isn't valid YAML, or lacks a required key, is reported with the file
   and line instead of a traceback.
 - An export with a header and no products is an error (exit 2) for both `audit` and
