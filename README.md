@@ -24,9 +24,9 @@ fields per item, and Google's feeds have their own rules. A shopping agent answe
 "is this kurta cotton, and do you have it in XL?" works from these structured fields
 first. A fabric mentioned only in a paragraph of marketing copy may or may not get used.
 
-shoplint shows the catalog the way a feed or an agent sees it: field by field, not as the
-product page a person reads. It works on the export file, offline, before anything is
-published.
+I help run a small ethnic-wear store on Shopify and wanted a way to see the catalog the way
+a feed or an agent sees it: field by field, not as the product page a person reads.
+shoplint works on the export file, offline, before anything is published.
 
 Online validators exist for the next step. An [ACP feed validator](https://frontend-aishoppingfeeds.pages.dev/tools/acp-feed-validator/)
 checks a feed you've already built, and "is your store AI-ready" checkers such as
