@@ -48,6 +48,9 @@ class Finding:
     detail: str
 
 
+PACK_KEYS = ("pack", "title", "source", "checked", "rules")
+
+
 def load_pack(path_or_name: str) -> Pack:
     p = Path(path_or_name)
     if p.suffix in {".yaml", ".yml"} and p.exists():
@@ -63,9 +66,19 @@ def load_pack(path_or_name: str) -> Pack:
             f"no rule pack {path_or_name!r}: use one of {', '.join(builtin_packs())} "
             "or a path to a .yaml file"
         )
-    data = yaml.safe_load(text)
+    try:
+        data = yaml.safe_load(text)
+    except yaml.YAMLError as e:
+        where = getattr(e, "problem_mark", None)
+        line = f" at line {where.line + 1}" if where else ""
+        raise ValueError(f"{path_or_name}: not valid YAML{line}") from e
+    missing = [k for k in PACK_KEYS if not isinstance(data, dict) or k not in data]
+    if missing:
+        raise ValueError(f"{path_or_name}: a rule pack needs {', '.join(missing)}")
     rules = []
-    for r in data["rules"]:
+    for n, r in enumerate(data["rules"] or [], start=1):
+        if not isinstance(r, dict) or not all(k in r for k in ("id", "check", "message")):
+            raise ValueError(f"{data['pack']}: rule {n} needs id, check and message")
         if r["check"] not in REGISTRY:
             raise ValueError(f"{data['pack']}: rule {r['id']} uses unknown check {r['check']!r}")
         if r.get("scope", "all") not in {"all", "apparel"}:

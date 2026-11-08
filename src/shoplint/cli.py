@@ -61,6 +61,9 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError) as err:
         print(f"error: {err}", file=sys.stderr)
         return 2
+    if not products:
+        print(f"error: {args.csv} has a header but no products", file=sys.stderr)
+        return 2
 
     if args.cmd == "export":
         rows, skipped = acp_rows(products, args.store_url, args.seller, args.currency)
@@ -72,8 +75,6 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  skipped {s}", file=sys.stderr)
         return 0
 
-    if not products:
-        print("warning: the file has a header but no products", file=sys.stderr)
     try:
         packs = [load_pack(n) for n in (args.pack or builtin_packs())]
     except (OSError, ValueError, KeyError) as err:

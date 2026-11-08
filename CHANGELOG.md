@@ -2,6 +2,13 @@
 
 Versions before 0.3.0 were published under the name agentready.
 
+## Unreleased
+
+- A rule pack that isn't valid YAML, or lacks a required key, is reported with the file
+  and line instead of a traceback.
+- An export with a header and no products is an error (exit 2) for both `audit` and
+  `export`. Before, `audit` reported 0/0 answerable and exited 0.
+
 ## 0.3.0
 
 - Renamed from agentready: that name on PyPI belongs to an unrelated project.

@@ -156,3 +156,23 @@ def test_findings_csv_and_input_protection(tmp_path):
     copy.write_bytes(BEFORE.read_bytes())
     assert main(["audit", str(copy), "--findings-csv", str(copy)]) == 2
     assert copy.read_bytes() == BEFORE.read_bytes()
+
+
+def test_broken_pack_yaml_is_an_error_not_a_traceback(tmp_path, capsys):
+    bad = tmp_path / "mine.yaml"
+    bad.write_text("rules: [\n", encoding="utf-8")
+    assert main(["audit", str(BEFORE), "--pack", str(bad)]) == 2
+    assert "not valid YAML at line 2" in capsys.readouterr().err
+    bad.write_text("pack: mine\nrules:\n  - id: x\n    check: size_system_consistent\n")
+    assert main(["audit", str(BEFORE), "--pack", str(bad)]) == 2
+    assert "needs title, source, checked" in capsys.readouterr().err
+
+
+def test_header_only_export_is_an_error(tmp_path, capsys):
+    empty = tmp_path / "products_export.csv"
+    empty.write_text("Handle,Title,Variant SKU\n", encoding="utf-8")
+    assert main(["audit", str(empty)]) == 2
+    out = tmp_path / "feed.jsonl"
+    args = ["export", str(empty), "--store-url", "https://x.example", "--seller", "X", "-o"]
+    assert main([*args, str(out)]) == 2
+    assert "no products" in capsys.readouterr().err and not out.exists()
