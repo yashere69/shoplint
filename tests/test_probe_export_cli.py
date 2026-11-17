@@ -163,7 +163,9 @@ def test_broken_pack_yaml_is_an_error_not_a_traceback(tmp_path, capsys):
     bad.write_text("rules: [\n", encoding="utf-8")
     assert main(["audit", str(BEFORE), "--pack", str(bad)]) == 2
     assert "not valid YAML at line 2" in capsys.readouterr().err
-    bad.write_text("pack: mine\nrules:\n  - id: x\n    check: size_system_consistent\n")
+    bad.write_text(
+        "pack: mine\nrules:\n  - id: x\n    check: size_system_consistent\n", encoding="utf-8"
+    )
     assert main(["audit", str(BEFORE), "--pack", str(bad)]) == 2
     assert "needs title, source, checked" in capsys.readouterr().err
 
